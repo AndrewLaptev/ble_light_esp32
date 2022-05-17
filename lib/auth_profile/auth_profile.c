@@ -65,7 +65,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
             for(short i = 0; i < param->write.len; i++) {
                 tmp[i] = param->write.value[i];
             }
-            ESP_LOGI("TEST", "%d", atoi(tmp));
+            ESP_LOGI("AUTH_MESSAGE", "%d", atoi(tmp));
 
             if (gl_profile_tab[PROFILE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
                 uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
