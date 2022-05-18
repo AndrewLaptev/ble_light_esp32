@@ -26,15 +26,15 @@
 
 #define PREPARE_BUF_MAX_SIZE        1024
 
-#define PROFILE_NUM 2
-#define PROFILE_AUTH_APP_ID 0
-#define PROFILE_LIGHT_APP_ID 1
+#define PROFILE_NUM                 2
+#define PROFILE_AUTH_APP_ID         0
+#define PROFILE_LIGHT_APP_ID        1
 
-#define GATTS_HANDLER_TAG "GATTS_HANDLER"
-#define GAP_HANDLER_TAG   "GAP_HANDLER"
+#define GATTS_HANDLER_TAG           "GATTS_HANDLER"
+#define GAP_HANDLER_TAG             "GAP_HANDLER"
 
-#define adv_config_flag      (1 << 0)
-#define scan_rsp_config_flag (1 << 1)
+#define adv_config_flag             (1 << 0)
+#define scan_rsp_config_flag        (1 << 1)
 
 uint8_t char1_str[3];
 esp_gatt_char_prop_t a_property;
