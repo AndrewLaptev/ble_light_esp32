@@ -1,67 +1,71 @@
 #include "common.h"
 #include "light_control.h"
+#include "ble_beacon.h"
 
 #define MAIN_TAG "MAIN"
 
 void app_main(void) {
-    esp_err_t ret;
+    esp_err_t err;
 
     // Initialize NVS.
-    ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
+        err = nvs_flash_init();
     }
-    ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(err);
 
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
 
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-    ret = esp_bt_controller_init(&bt_cfg);
-    if (ret) {
-        ESP_LOGE(MAIN_TAG, "%s initialize controller failed: %s\n", __func__, esp_err_to_name(ret));
+
+    if ((err = esp_bt_controller_init(&bt_cfg))) {
+        ESP_LOGE(MAIN_TAG, "%s: initialize controller failed: %s\n", __func__, esp_err_to_name(err));
         return;
     }
 
-    ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
-    if (ret) {
-        ESP_LOGE(MAIN_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
-        return;
-    }
-    ret = esp_bluedroid_init();
-    if (ret) {
-        ESP_LOGE(MAIN_TAG, "%s init bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
-        return;
-    }
-    ret = esp_bluedroid_enable();
-    if (ret) {
-        ESP_LOGE(MAIN_TAG, "%s enable bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
+    if ((err = esp_bt_controller_enable(ESP_BT_MODE_BLE))) {
+        ESP_LOGE(MAIN_TAG, "%s: enable controller failed: %s\n", __func__, esp_err_to_name(err));
         return;
     }
 
-    ret = esp_ble_gatts_register_callback(gatts_event_handler);
-    if (ret){
-        ESP_LOGE(MAIN_TAG, "gatts register error, error code = %x", ret);
+    if ((err = esp_bluedroid_init())) {
+        ESP_LOGE(MAIN_TAG, "%s: init bluetooth failed: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-    ret = esp_ble_gap_register_callback(gap_event_handler);
-    if (ret){
-        ESP_LOGE(MAIN_TAG, "gap register error, error code = %x", ret);
+    if ((err = esp_bluedroid_enable())) {
+        ESP_LOGE(MAIN_TAG, "%s: enable bluetooth failed: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-    ret = esp_ble_gatts_app_register(PROFILE_AUTH_APP_ID);
-    if (ret){
-        ESP_LOGE(MAIN_TAG, "gatts app register error, error code = %x", ret);
+
+    if ((err = esp_ble_gatts_register_callback(gatts_event_handler))){
+        ESP_LOGE(MAIN_TAG, "%s: gatts register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-    ret = esp_ble_gatts_app_register(PROFILE_LIGHT_APP_ID);
-    if (ret){
-        ESP_LOGE(MAIN_TAG, "gatts app register error, error code = %x", ret);
+
+    if ((err = esp_ble_gap_register_callback(gap_event_handler))){
+        ESP_LOGE(MAIN_TAG, "%s: gap register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-    esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(500);
-    if (local_mtu_ret){
-        ESP_LOGE(MAIN_TAG, "set local  MTU failed, error code = %x", local_mtu_ret);
+
+    if ((err = esp_ble_gatts_app_register(PROFILE_AUTH_APP_ID))){
+        ESP_LOGE(MAIN_TAG, "%s: gatts app register error: %s\n", __func__, esp_err_to_name(err));
+        return;
+    }
+
+    if ((err = esp_ble_gatts_app_register(PROFILE_LIGHT_APP_ID))){
+        ESP_LOGE(MAIN_TAG, "%s: gatts app register error: %s\n", __func__, esp_err_to_name(err));
+        return;
+    }
+
+    if ((err = esp_ble_gatt_set_local_mtu(500))){
+        ESP_LOGE(MAIN_TAG, "%s: set local  MTU failed: %s\n", __func__, esp_err_to_name(err));
+        return;
+    }
+
+    if ((err = ble_ibeacon_app_register())){
+        ESP_LOGE(MAIN_TAG, "%s: beacon app register error: %s\n", __func__, esp_err_to_name(err));
+        return;
     }
     
     ledc_init();

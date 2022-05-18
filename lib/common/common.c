@@ -1,6 +1,7 @@
 #include "common.h"
 #include "light_profile.h"
 #include "auth_profile.h"
+#include "ble_beacon.h"
 
 uint8_t char1_str[3] = {0x11,0x22,0x33};
 esp_gatt_char_prop_t a_property = 0;
@@ -92,6 +93,7 @@ struct gatts_profile_inst gl_profile_tab[PROFILE_NUM] = {
 
 
 void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
+    esp_err_t err;
     switch (event) {
 #ifdef CONFIG_SET_RAW_ADV_DATA
     case ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT:
@@ -141,6 +143,58 @@ void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
                   param->update_conn_params.conn_int,
                   param->update_conn_params.latency,
                   param->update_conn_params.timeout);
+        break;
+    case ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT:{
+#if (IBEACON_MODE == IBEACON_SENDER)
+        esp_ble_gap_start_advertising(&adv_params);
+#endif
+        break;
+    }
+    case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
+#if (IBEACON_MODE == IBEACON_RECEIVER)
+        //the unit of the duration is second, 0 means scan permanently
+        uint32_t duration = 0;
+        esp_ble_gap_start_scanning(duration);
+#endif
+        break;
+    }
+    case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
+        //scan start complete event to indicate scan start successfully or failed
+        if ((err = param->scan_start_cmpl.status) != ESP_BT_STATUS_SUCCESS) {
+            ESP_LOGE(GAP_HANDLER_TAG, "Scan start failed: %s", esp_err_to_name(err));
+        }
+        break;
+    case ESP_GAP_BLE_SCAN_RESULT_EVT: {
+        esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
+        switch (scan_result->scan_rst.search_evt) {
+        case ESP_GAP_SEARCH_INQ_RES_EVT:
+            /* Search for BLE iBeacon Packet */
+            if (esp_ble_is_ibeacon_packet(scan_result->scan_rst.ble_adv, scan_result->scan_rst.adv_data_len)){
+                esp_ble_ibeacon_t *ibeacon_data = (esp_ble_ibeacon_t*)(scan_result->scan_rst.ble_adv);
+                ESP_LOGI(GAP_HANDLER_TAG, "----------iBeacon Found----------");
+                esp_log_buffer_hex("IBEACON_DEMO: Device address:", scan_result->scan_rst.bda, ESP_BD_ADDR_LEN );
+                esp_log_buffer_hex("IBEACON_DEMO: Proximity UUID:", ibeacon_data->ibeacon_vendor.proximity_uuid, ESP_UUID_LEN_128);
+
+                uint16_t major = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.major);
+                uint16_t minor = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.minor);
+                ESP_LOGI(GAP_HANDLER_TAG, "Major: 0x%04x (%d)", major, major);
+                ESP_LOGI(GAP_HANDLER_TAG, "Minor: 0x%04x (%d)", minor, minor);
+                ESP_LOGI(GAP_HANDLER_TAG, "Measured power (RSSI at a 1m distance):%d dbm", ibeacon_data->ibeacon_vendor.measured_power);
+                ESP_LOGI(GAP_HANDLER_TAG, "RSSI of packet:%d dbm", scan_result->scan_rst.rssi);
+            }
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
+        if ((err = param->scan_stop_cmpl.status) != ESP_BT_STATUS_SUCCESS){
+            ESP_LOGE(GAP_HANDLER_TAG, "Scan stop failed: %s", esp_err_to_name(err));
+        }
+        else {
+            ESP_LOGI(GAP_HANDLER_TAG, "Stop scan successfully");
+        }
         break;
     default:
         break;
