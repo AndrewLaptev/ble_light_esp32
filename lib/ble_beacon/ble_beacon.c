@@ -118,18 +118,12 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
 
 esp_err_t ble_ibeacon_app_register(void) {
     esp_err_t err;
-
-    ESP_LOGI(BEACON_TAG, "register callback");
-
-    //register the scan callback function to the gap module
-    // if ((err = esp_ble_gap_register_callback(esp_gap_cb))) {
-    //     return err;
-    // }
     
     /* set parameters */
     #if (IBEACON_MODE == IBEACON_RECEIVER)
-        esp_ble_gap_set_scan_params(&ble_scan_params);
-
+        if((err = esp_ble_gap_set_scan_params(&ble_scan_params))) {
+            return err;
+        }
     #elif (IBEACON_MODE == IBEACON_SENDER)
         esp_ble_ibeacon_t ibeacon_adv_data;
         if ((err = esp_ble_config_ibeacon_data (&vendor_config, &ibeacon_adv_data))){
