@@ -23,7 +23,6 @@ void app_main(void) {
         ESP_LOGE(MAIN_TAG, "%s: initialize controller failed: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-
     if ((err = esp_bt_controller_enable(ESP_BT_MODE_BLE))) {
         ESP_LOGE(MAIN_TAG, "%s: enable controller failed: %s\n", __func__, esp_err_to_name(err));
         return;
@@ -42,17 +41,14 @@ void app_main(void) {
         ESP_LOGE(MAIN_TAG, "%s: gatts register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-
     if ((err = esp_ble_gap_register_callback(gap_event_handler))){
         ESP_LOGE(MAIN_TAG, "%s: gap register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-
     if ((err = esp_ble_gatts_app_register(PROFILE_AUTH_APP_ID))){
         ESP_LOGE(MAIN_TAG, "%s: gatts app register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-
     if ((err = esp_ble_gatts_app_register(PROFILE_LIGHT_APP_ID))){
         ESP_LOGE(MAIN_TAG, "%s: gatts app register error: %s\n", __func__, esp_err_to_name(err));
         return;
@@ -63,10 +59,10 @@ void app_main(void) {
         return;
     }
 
-    if ((err = ble_ibeacon_app_register())){
-        ESP_LOGE(MAIN_TAG, "%s: beacon app register error: %s\n", __func__, esp_err_to_name(err));
-        return;
-    }
+    // if ((err = ble_ibeacon_app_register())){
+    //     ESP_LOGE(MAIN_TAG, "%s: beacon app register error: %s\n", __func__, esp_err_to_name(err));
+    //     return;
+    // }
     
     ledc_init();
 
