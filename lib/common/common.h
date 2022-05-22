@@ -36,6 +36,9 @@
 #define adv_config_flag             (1 << 0)
 #define scan_rsp_config_flag        (1 << 1)
 
+int auth_token;
+bool auth_appear;
+
 uint8_t char1_str[3];
 esp_gatt_char_prop_t a_property;
 esp_gatt_char_prop_t b_property;

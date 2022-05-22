@@ -1,5 +1,22 @@
 #include "auth_profile.h"
 
+auth_users_db db1 = {
+    .users_count = 0
+};
+
+void add_user_to_db(auth_users_db *db, char *username, char *password, uint8_t permissions) {
+    for (uint8_t i = 0; i < USERNAME_LENGHT; i++) {
+        db->users[db->users_count].username[i] = username[i];
+    }
+
+    for (uint8_t i = 0; i < PASSWORD_LENGHT; i++) {
+        db->users[db->users_count].password[i] = password[i];
+    }
+
+    db->users[db->users_count].permissions = permissions;
+    db->users[db->users_count].id = db->users_count;
+    db->users_count++;
+}
 
 void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
     switch (event) {
@@ -65,7 +82,15 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
             for(short i = 0; i < param->write.len; i++) {
                 tmp[i] = param->write.value[i];
             }
-            ESP_LOGI("AUTH_MESSAGE", "%d", atoi(tmp));
+
+            if (auth_token == atoi(tmp)) {
+                auth_appear = true;
+                ESP_LOGI("AUTH_MESSAGE", "Correct token. You are successfully authorized!");
+            } else {
+                ESP_LOGI("AUTH_MESSAGE", "Incorrect token!");
+            }
+
+
 
             if (gl_profile_tab[PROFILE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
                 uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
@@ -193,6 +218,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
     case ESP_GATTS_DISCONNECT_EVT:
         ESP_LOGI(GATT_AUTH_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
         esp_ble_gap_start_advertising(&adv_params);
+        auth_appear = false;
         break;
     case ESP_GATTS_CONF_EVT:
         ESP_LOGI(GATT_AUTH_TAG, "ESP_GATTS_CONF_EVT, status %d attr_handle %d", param->conf.status, param->conf.handle);
