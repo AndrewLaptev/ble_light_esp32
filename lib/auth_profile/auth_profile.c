@@ -1,22 +1,6 @@
 #include "auth_profile.h"
 
-auth_users_db db1 = {
-    .users_count = 0
-};
-
-void add_user_to_db(auth_users_db *db, char *username, char *password, uint8_t permissions) {
-    for (uint8_t i = 0; i < USERNAME_LENGHT; i++) {
-        db->users[db->users_count].username[i] = username[i];
-    }
-
-    for (uint8_t i = 0; i < PASSWORD_LENGHT; i++) {
-        db->users[db->users_count].password[i] = password[i];
-    }
-
-    db->users[db->users_count].permissions = permissions;
-    db->users[db->users_count].id = db->users_count;
-    db->users_count++;
-}
+#include "users_db.h"
 
 void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
     switch (event) {
@@ -78,18 +62,30 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         if (!param->write.is_prep){
             ESP_LOGI(GATT_AUTH_TAG, "GATT_WRITE_EVT, value len %d, value :", param->write.len);
             
-            char tmp[32];
+            char buffer[AUTH_MSG_BUFFER_LEN];
+            memset(buffer, '\0', AUTH_MSG_BUFFER_LEN);
+
             for(short i = 0; i < param->write.len; i++) {
-                tmp[i] = param->write.value[i];
+                buffer[i] = param->write.value[i];
             }
 
-            if (auth_token == atoi(tmp)) {
-                auth_appear = true;
-                ESP_LOGI("AUTH_MESSAGE", "Correct token. You are successfully authorized!");
-            } else {
-                ESP_LOGI("AUTH_MESSAGE", "Incorrect token!");
-            }
+            // if (auth_token == atoi(tmp)) {
+            //     auth_appear = true;
+            //     ESP_LOGI("AUTH_MESSAGE", "Correct token. You are successfully authorized!");
+            // } else {
+            //     ESP_LOGI("AUTH_MESSAGE", "Incorrect token!");
+            // }
 
+            auth_user_profile user;
+            user.id = 0;
+            memset(user.username, '\0', USERNAME_LENGHT);
+            memset(user.password, '\0', PASSWORD_LENGHT);
+            user.permissions = 0;
+
+            users_data_parser(&user, buffer, AUTH_MSG_BUFFER_LEN);
+
+            add_user_to_db(&database_1, &user);
+            show_db(&database_1);
 
 
             if (gl_profile_tab[PROFILE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){

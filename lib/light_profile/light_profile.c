@@ -32,13 +32,13 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
             ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, value len %d, value :", param->write.len);
 
             if (auth_appear == true) {
-                char tmp[32];
+                char buffer[LIGHT_MSG_BUFFER_LEN];
                 int light_level;
 
                 for(short i = 0; i < param->write.len; i++) {
-                    tmp[i] = param->write.value[i];
+                    buffer[i] = param->write.value[i];
                 }
-                light_level = atoi(tmp);
+                light_level = atoi(buffer);
                 ESP_LOGI("LIGHT_MESSAGE", "%d", light_level);
                 ledc_control(light_level);
             } else {
