@@ -36,9 +36,6 @@
 #define adv_config_flag             (1 << 0)
 #define scan_rsp_config_flag        (1 << 1)
 
-int auth_token;
-bool auth_appear;
-
 uint8_t char1_str[3];
 esp_gatt_char_prop_t a_property;
 esp_gatt_char_prop_t b_property;
@@ -71,6 +68,8 @@ struct gatts_profile_inst {
     uint16_t descr_handle;
     esp_bt_uuid_t descr_uuid;
 };
+
+int access_token;
 
 struct gatts_profile_inst gl_profile_tab[PROFILE_NUM];
 

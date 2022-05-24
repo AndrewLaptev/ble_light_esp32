@@ -1,6 +1,6 @@
 #include "common.h"
 #include "light_control.h"
-#include "ble_beacon.h"
+#include "access_db.h"
 
 #define MAIN_TAG "MAIN"
 
@@ -59,12 +59,10 @@ void app_main(void) {
         return;
     }
 
-    // if ((err = ble_ibeacon_app_register())){
-    //     ESP_LOGE(MAIN_TAG, "%s: beacon app register error: %s\n", __func__, esp_err_to_name(err));
-    //     return;
-    // }
     
     ledc_init();
+
+    init_connect_db(&access_db);
 
     return;
 }

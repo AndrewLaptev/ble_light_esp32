@@ -4,6 +4,7 @@
 #include "common.h"
 #include "long_write_msg.h"
 #include "light_control.h"
+#include "access_db.h"
 
 #define GATT_LIGHT_TAG "GATT_LIGHT_PROFILE"
 

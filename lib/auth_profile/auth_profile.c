@@ -1,6 +1,13 @@
 #include "auth_profile.h"
 
-#include "users_db.h"
+bool authorization_connection(char *auth_msg, int access_token) {
+    int auth_num;
+    sscanf(auth_msg, "%d", &auth_num);
+    
+    if (auth_num == access_token) { return true; }
+
+    return false;
+}
 
 void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
     switch (event) {
@@ -69,23 +76,17 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
                 buffer[i] = param->write.value[i];
             }
 
-            // if (auth_token == atoi(tmp)) {
-            //     auth_appear = true;
-            //     ESP_LOGI("AUTH_MESSAGE", "Correct token. You are successfully authorized!");
-            // } else {
-            //     ESP_LOGI("AUTH_MESSAGE", "Incorrect token!");
-            // }
 
-            auth_user_profile user;
-            user.id = 0;
-            memset(user.username, '\0', USERNAME_LENGHT);
-            memset(user.password, '\0', PASSWORD_LENGHT);
-            user.permissions = 0;
-
-            users_data_parser(&user, buffer, AUTH_MSG_BUFFER_LEN);
-
-            add_user_to_db(&database_1, &user);
-            show_db(&database_1);
+            bool ans;
+            if ((ans = authorization_connection(buffer, access_token))) {
+                if ((ans = add_connection_to_db(&access_db, param))) {
+                    show_db(&access_db, ACCESS_BD_SHOW_ROWS);
+                } else {
+                    ESP_LOGW(GATT_AUTH_TAG, "Connection to light service already exist in access DB!");
+                }
+            } else {
+                ESP_LOGW(GATT_AUTH_TAG, "Incorrect access token!");
+            }
 
 
             if (gl_profile_tab[PROFILE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
@@ -141,8 +142,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         ESP_LOGI(GATT_AUTH_TAG, "CREATE_SERVICE_EVT, status %d,  service_handle %d\n", param->create.status, param->create.service_handle);
         gl_profile_tab[PROFILE_AUTH_APP_ID].service_handle = param->create.service_handle;
         gl_profile_tab[PROFILE_AUTH_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_AUTH
-    ;
+        gl_profile_tab[PROFILE_AUTH_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_AUTH;
 
         esp_ble_gatts_start_service(gl_profile_tab[PROFILE_AUTH_APP_ID].service_handle);
         a_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
@@ -209,12 +209,19 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         gl_profile_tab[PROFILE_AUTH_APP_ID].conn_id = param->connect.conn_id;
         //start sent the update connection parameters to the peer device.
         esp_ble_gap_update_conn_params(&conn_params);
+        esp_ble_gap_start_advertising(&adv_params);
         break;
     }
     case ESP_GATTS_DISCONNECT_EVT:
         ESP_LOGI(GATT_AUTH_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
         esp_ble_gap_start_advertising(&adv_params);
-        auth_appear = false;
+        
+        bool ans;
+            if (!(ans = remove_connection_from_db(&access_db, param))) {
+                ESP_LOGW(GATT_AUTH_TAG, "Failed remove connection from access DB!");
+            }
+        show_db(&access_db, ACCESS_BD_SHOW_ROWS);
+
         break;
     case ESP_GATTS_CONF_EVT:
         ESP_LOGI(GATT_AUTH_TAG, "ESP_GATTS_CONF_EVT, status %d attr_handle %d", param->conf.status, param->conf.handle);

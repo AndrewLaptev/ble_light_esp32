@@ -31,18 +31,24 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         if (!param->write.is_prep){
             ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, value len %d, value :", param->write.len);
 
-            if (auth_appear == true) {
+            bool ans;
+            if((ans = check_connection_db(&access_db, param))) {
                 char buffer[LIGHT_MSG_BUFFER_LEN];
+                memset(buffer, '\0', LIGHT_MSG_BUFFER_LEN);
                 int light_level;
 
                 for(short i = 0; i < param->write.len; i++) {
                     buffer[i] = param->write.value[i];
                 }
-                light_level = atoi(buffer);
-                ESP_LOGI("LIGHT_MESSAGE", "%d", light_level);
-                ledc_control(light_level);
+
+                if (!(sscanf(buffer, "%d", &light_level) == 0 || sscanf(buffer, "%d", &light_level) == -1)) {
+                    ledc_control(light_level);
+                    ESP_LOGI(GATT_LIGHT_TAG, "Light level: %d", light_level);
+                } else {
+                    ESP_LOGW(GATT_LIGHT_TAG, "Incorrect light mode message!");
+                }
             } else {
-                ESP_LOGI("LIGHT_MESSAGE", "Unautharized message!");
+                ESP_LOGW(GATT_LIGHT_TAG, "Unautharized message!");
             }
 
             if (gl_profile_tab[PROFILE_LIGHT_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
