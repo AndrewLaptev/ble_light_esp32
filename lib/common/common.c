@@ -1,6 +1,6 @@
 #include "common.h"
-#include "light_profile.h"
-#include "auth_profile.h"
+#include "service_light.h"
+#include "service_auth.h"
 #include "ble_beacon.h"
 
 int access_token = 12345;
@@ -81,12 +81,12 @@ esp_ble_adv_params_t adv_params = {
 };
 
 /* One gatt-based profile one app_id and one gatts_if, this array will store the gatts_if returned by ESP_GATTS_REG_EVT */
-struct gatts_profile_inst gl_profile_tab[PROFILE_NUM] = {
-    [PROFILE_AUTH_APP_ID] = {
+struct gatts_service_inst gl_service_tab[SERVICE_NUM] = {
+    [SERVICE_AUTH_APP_ID] = {
         .gatts_cb = gatts_profile_auth_event_handler,
         .gatts_if = ESP_GATT_IF_NONE,       /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
     },
-    [PROFILE_LIGHT_APP_ID] = {
+    [SERVICE_LIGHT_APP_ID] = {
         .gatts_cb = gatts_profile_light_event_handler,                   /* This demo does not implement, similar as profile A */
         .gatts_if = ESP_GATT_IF_NONE,       /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
     },
@@ -208,7 +208,7 @@ void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp
     /* If event is register event, store the gatts_if for each profile */
     if (event == ESP_GATTS_REG_EVT) {
         if (param->reg.status == ESP_GATT_OK) {
-            gl_profile_tab[param->reg.app_id].gatts_if = gatts_if;
+            gl_service_tab[param->reg.app_id].gatts_if = gatts_if;
         } else {
             ESP_LOGI(GATTS_HANDLER_TAG, "Reg app failed, app_id %04x, status %d\n",
                     param->reg.app_id,
@@ -221,11 +221,11 @@ void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp
      * so here call each profile's callback */
     do {
         int idx;
-        for (idx = 0; idx < PROFILE_NUM; idx++) {
+        for (idx = 0; idx < SERVICE_NUM; idx++) {
             if (gatts_if == ESP_GATT_IF_NONE || /* ESP_GATT_IF_NONE, not specify a certain gatt_if, need to call every profile cb function */
-                    gatts_if == gl_profile_tab[idx].gatts_if) {
-                if (gl_profile_tab[idx].gatts_cb) {
-                    gl_profile_tab[idx].gatts_cb(event, gatts_if, param);
+                    gatts_if == gl_service_tab[idx].gatts_if) {
+                if (gl_service_tab[idx].gatts_cb) {
+                    gl_service_tab[idx].gatts_cb(event, gatts_if, param);
                 }
             }
         }

@@ -45,11 +45,11 @@ void app_main(void) {
         ESP_LOGE(MAIN_TAG, "%s: gap register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-    if ((err = esp_ble_gatts_app_register(PROFILE_AUTH_APP_ID))){
+    if ((err = esp_ble_gatts_app_register(SERVICE_AUTH_APP_ID))){
         ESP_LOGE(MAIN_TAG, "%s: gatts app register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
-    if ((err = esp_ble_gatts_app_register(PROFILE_LIGHT_APP_ID))){
+    if ((err = esp_ble_gatts_app_register(SERVICE_LIGHT_APP_ID))){
         ESP_LOGE(MAIN_TAG, "%s: gatts app register error: %s\n", __func__, esp_err_to_name(err));
         return;
     }
@@ -59,7 +59,6 @@ void app_main(void) {
         return;
     }
 
-    
     ledc_init();
 
     init_connect_db(&access_db);

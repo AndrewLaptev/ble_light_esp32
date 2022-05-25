@@ -1,5 +1,5 @@
-#ifndef _LIGHT_PROFILE_H_
-#define _LIGHT_PROFILE_H_
+#ifndef _SERVICE_LIGHT_H_
+#define _SERVICE_LIGHT_H_
 
 #include "common.h"
 #include "long_write_msg.h"

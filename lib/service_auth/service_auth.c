@@ -1,4 +1,4 @@
-#include "auth_profile.h"
+#include "service_auth.h"
 
 bool authorization_connection(char *auth_msg, int access_token) {
     int auth_num;
@@ -13,10 +13,10 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
     switch (event) {
     case ESP_GATTS_REG_EVT:
         ESP_LOGI(GATT_AUTH_TAG, "REGISTER_APP_EVT, status %d, app_id %d\n", param->reg.status, param->reg.app_id);
-        gl_profile_tab[PROFILE_AUTH_APP_ID].service_id.is_primary = true;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].service_id.id.inst_id = 0x00;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_AUTH;
+        gl_service_tab[SERVICE_AUTH_APP_ID].service_id.is_primary = true;
+        gl_service_tab[SERVICE_AUTH_APP_ID].service_id.id.inst_id = 0x00;
+        gl_service_tab[SERVICE_AUTH_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
+        gl_service_tab[SERVICE_AUTH_APP_ID].service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_AUTH;
 
         esp_err_t set_dev_name_ret = esp_ble_gap_set_device_name(DEVICE_NAME);
         if (set_dev_name_ret){
@@ -48,7 +48,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         adv_config_done |= scan_rsp_config_flag;
 
 #endif
-        esp_ble_gatts_create_service(gatts_if, &gl_profile_tab[PROFILE_AUTH_APP_ID].service_id, GATTS_NUM_HANDLE_AUTH);
+        esp_ble_gatts_create_service(gatts_if, &gl_service_tab[SERVICE_AUTH_APP_ID].service_id, GATTS_NUM_HANDLE_AUTH);
         break;
     case ESP_GATTS_READ_EVT: {
         ESP_LOGI(GATT_AUTH_TAG, "GATT_READ_EVT, conn_id %d, trans_id %d, handle %d\n", param->read.conn_id, param->read.trans_id, param->read.handle);
@@ -89,7 +89,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
             }
 
 
-            if (gl_profile_tab[PROFILE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
+            if (gl_service_tab[SERVICE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
                 uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
                 if (descr_value == 0x0001){
                     if (a_property & ESP_GATT_CHAR_PROP_BIT_NOTIFY){
@@ -100,7 +100,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
                             notify_data[i] = i%0xff;
                         }
                         //the size of notify_data[] need less than MTU size
-                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_profile_tab[PROFILE_AUTH_APP_ID].char_handle,
+                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_service_tab[SERVICE_AUTH_APP_ID].char_handle,
                                                 sizeof(notify_data), notify_data, false);
                     }
                 }else if (descr_value == 0x0002){
@@ -112,7 +112,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
                             indicate_data[i] = i%0xff;
                         }
                         //the size of indicate_data[] need less than MTU size
-                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_profile_tab[PROFILE_AUTH_APP_ID].char_handle,
+                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, gl_service_tab[SERVICE_AUTH_APP_ID].char_handle,
                                                 sizeof(indicate_data), indicate_data, true);
                     }
                 }
@@ -140,13 +140,13 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         break;
     case ESP_GATTS_CREATE_EVT:
         ESP_LOGI(GATT_AUTH_TAG, "CREATE_SERVICE_EVT, status %d,  service_handle %d\n", param->create.status, param->create.service_handle);
-        gl_profile_tab[PROFILE_AUTH_APP_ID].service_handle = param->create.service_handle;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_AUTH;
+        gl_service_tab[SERVICE_AUTH_APP_ID].service_handle = param->create.service_handle;
+        gl_service_tab[SERVICE_AUTH_APP_ID].char_uuid.len = ESP_UUID_LEN_16;
+        gl_service_tab[SERVICE_AUTH_APP_ID].char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_AUTH;
 
-        esp_ble_gatts_start_service(gl_profile_tab[PROFILE_AUTH_APP_ID].service_handle);
+        esp_ble_gatts_start_service(gl_service_tab[SERVICE_AUTH_APP_ID].service_handle);
         a_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-        esp_err_t add_char_ret = esp_ble_gatts_add_char(gl_profile_tab[PROFILE_AUTH_APP_ID].service_handle, &gl_profile_tab[PROFILE_AUTH_APP_ID].char_uuid,
+        esp_err_t add_char_ret = esp_ble_gatts_add_char(gl_service_tab[SERVICE_AUTH_APP_ID].service_handle, &gl_service_tab[SERVICE_AUTH_APP_ID].char_uuid,
                                                         ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
                                                         a_property,
                                                         &gatts_demo_char1_val, NULL);
@@ -162,9 +162,9 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
 
         ESP_LOGI(GATT_AUTH_TAG, "ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d\n",
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
-        gl_profile_tab[PROFILE_AUTH_APP_ID].char_handle = param->add_char.attr_handle;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
-        gl_profile_tab[PROFILE_AUTH_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
+        gl_service_tab[SERVICE_AUTH_APP_ID].char_handle = param->add_char.attr_handle;
+        gl_service_tab[SERVICE_AUTH_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
+        gl_service_tab[SERVICE_AUTH_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
         esp_err_t get_attr_ret = esp_ble_gatts_get_attr_value(param->add_char.attr_handle,  &length, &prf_char);
         if (get_attr_ret == ESP_FAIL){
             ESP_LOGE(GATT_AUTH_TAG, "ILLEGAL HANDLE");
@@ -174,7 +174,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         for(int i = 0; i < length; i++){
             ESP_LOGI(GATT_AUTH_TAG, "prf_char[%x] =%x\n",i,prf_char[i]);
         }
-        esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(gl_profile_tab[PROFILE_AUTH_APP_ID].service_handle, &gl_profile_tab[PROFILE_AUTH_APP_ID].descr_uuid,
+        esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(gl_service_tab[SERVICE_AUTH_APP_ID].service_handle, &gl_service_tab[SERVICE_AUTH_APP_ID].descr_uuid,
                                                                 ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, NULL, NULL);
         if (add_descr_ret){
             ESP_LOGE(GATT_AUTH_TAG, "add char descr failed, error code =%x", add_descr_ret);
@@ -182,7 +182,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         break;
     }
     case ESP_GATTS_ADD_CHAR_DESCR_EVT:
-        gl_profile_tab[PROFILE_AUTH_APP_ID].descr_handle = param->add_char_descr.attr_handle;
+        gl_service_tab[SERVICE_AUTH_APP_ID].descr_handle = param->add_char_descr.attr_handle;
         ESP_LOGI(GATT_AUTH_TAG, "ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d\n",
                  param->add_char_descr.status, param->add_char_descr.attr_handle, param->add_char_descr.service_handle);
         break;
@@ -206,7 +206,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
                  param->connect.conn_id,
                  param->connect.remote_bda[0], param->connect.remote_bda[1], param->connect.remote_bda[2],
                  param->connect.remote_bda[3], param->connect.remote_bda[4], param->connect.remote_bda[5]);
-        gl_profile_tab[PROFILE_AUTH_APP_ID].conn_id = param->connect.conn_id;
+        gl_service_tab[SERVICE_AUTH_APP_ID].conn_id = param->connect.conn_id;
         //start sent the update connection parameters to the peer device.
         esp_ble_gap_update_conn_params(&conn_params);
         esp_ble_gap_start_advertising(&adv_params);

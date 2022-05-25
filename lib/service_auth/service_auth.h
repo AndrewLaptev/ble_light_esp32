@@ -1,5 +1,5 @@
-#ifndef _AUTH_PROFILE_H_
-#define _AUTH_PROFILE_H_
+#ifndef _SERVICE_AUTH_H_
+#define _SERVICE_AUTH_H_
 
 #include "common.h"
 #include "long_write_msg.h"

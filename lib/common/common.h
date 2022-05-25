@@ -26,9 +26,9 @@
 
 #define PREPARE_BUF_MAX_SIZE        1024
 
-#define PROFILE_NUM                 2
-#define PROFILE_AUTH_APP_ID         0
-#define PROFILE_LIGHT_APP_ID        1
+#define SERVICE_NUM                 2
+#define SERVICE_AUTH_APP_ID         0
+#define SERVICE_LIGHT_APP_ID        1
 
 #define GATTS_HANDLER_TAG           "GATTS_HANDLER"
 #define GAP_HANDLER_TAG             "GAP_HANDLER"
@@ -54,7 +54,7 @@ esp_ble_adv_data_t scan_rsp_data;
 
 esp_ble_adv_params_t adv_params;
 
-struct gatts_profile_inst {
+struct gatts_service_inst {
     esp_gatts_cb_t gatts_cb;
     uint16_t gatts_if;
     uint16_t app_id;
@@ -71,7 +71,7 @@ struct gatts_profile_inst {
 
 int access_token;
 
-struct gatts_profile_inst gl_profile_tab[PROFILE_NUM];
+struct gatts_service_inst gl_service_tab[SERVICE_NUM];
 
 void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
