@@ -211,16 +211,6 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         break;
     }
     case ESP_GATTS_DISCONNECT_EVT:
-        ESP_LOGI(GATT_AUTH_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
-        esp_ble_gap_start_advertising(&adv_params);
-        
-        err_connect err = remove_connection_from_db(&connect_db, param);
-        if (err == ERR_CONNECT_EXIST) {
-            show_db(&connect_db, DB_MAX_SHOW_ROWS);
-        } else {
-            ESP_LOGW(GATT_AUTH_TAG, "ESP_GATTS_DISCONNECT_EVT, Remove connection from DB in %s: %s\n", __func__, err_connect_check(err));
-        }
-
         break;
     case ESP_GATTS_CONF_EVT:
         ESP_LOGI(GATT_AUTH_TAG, "ESP_GATTS_CONF_EVT, status %d attr_handle %d", param->conf.status, param->conf.handle);

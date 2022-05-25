@@ -1,5 +1,20 @@
 #include "service_light.h"
 
+int consensus_light_set(connections_db *db) {
+    int light_mode_cons = 0;
+    int check_connect_counter = 0;
+    for (int i = 0; i < db->sum_connections; i++) {
+        if (db->connections[i].light_mode != -1) {
+            light_mode_cons += db->connections[i].light_mode;
+            check_connect_counter++;
+        }
+    }
+    if (check_connect_counter == 0) {
+        return 0;
+    }
+    light_mode_cons = (int)((float)light_mode_cons / (float)check_connect_counter);
+    return light_mode_cons;
+}
 
 void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
     switch (event) {
@@ -35,15 +50,21 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
             if(err == ERR_CONNECT_EXIST) {
                 char buffer[LIGHT_MSG_BUFFER_LEN];
                 memset(buffer, '\0', LIGHT_MSG_BUFFER_LEN);
-                int light_level;
+                int light_mode;
+                int light_mode_cons;
 
                 for(short i = 0; i < param->write.len; i++) {
                     buffer[i] = param->write.value[i];
                 }
 
-                if (!(sscanf(buffer, "%d", &light_level) == 0 || sscanf(buffer, "%d", &light_level) == -1) && light_level >= 0) {
-                    ledc_control(light_level);
-                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light level: %d", light_level);
+                if (!(sscanf(buffer, "%d", &light_mode) == 0 || sscanf(buffer, "%d", &light_mode) == -1) && light_mode >= 0) {
+                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light mode msg: %d\n", light_mode);
+                    write_light_mode_to_db(&connect_db, param, light_mode);
+                    show_db(&connect_db, -1);
+
+                    light_mode_cons = consensus_light_set(&connect_db);
+                    ledc_control(light_mode_cons);
+                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode: %d\n", light_mode_cons);
                 } else {
                     ESP_LOGW(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Write light mode in %s: Incorrect light mode message!\n", __func__);
                 }
@@ -153,8 +174,22 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         if (param->conf.status != ESP_GATT_OK){
             esp_log_buffer_hex(GATT_LIGHT_TAG, param->conf.value, param->conf.len);
         }
-    break;
+        break;
     case ESP_GATTS_DISCONNECT_EVT:
+        ESP_LOGI(GATT_LIGHT_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
+        esp_ble_gap_start_advertising(&adv_params);
+        
+        err_connect err = remove_connection_from_db(&connect_db, param);
+        if (err == ERR_CONNECT_EXIST) {
+            show_db(&connect_db, DB_MAX_SHOW_ROWS);
+
+            int light_mode_cons = consensus_light_set(&connect_db);
+            ledc_control(light_mode_cons);
+            ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode: %d\n", light_mode_cons);
+        } else {
+            ESP_LOGW(GATT_LIGHT_TAG, "ESP_GATTS_DISCONNECT_EVT, Remove connection from DB in %s: %s\n", __func__, err_connect_check(err));
+        }
+        break;
     case ESP_GATTS_OPEN_EVT:
     case ESP_GATTS_CANCEL_OPEN_EVT:
     case ESP_GATTS_CLOSE_EVT:
