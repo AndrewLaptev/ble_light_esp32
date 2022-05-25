@@ -1,5 +1,7 @@
 #include "service_auth.h"
 
+int access_token = ACCESS_TOKEN_VAL;
+
 bool authorization_connection(char *auth_msg, int access_token) {
     int auth_num;
     sscanf(auth_msg, "%d", &auth_num);

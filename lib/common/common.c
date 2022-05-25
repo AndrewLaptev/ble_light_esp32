@@ -3,7 +3,6 @@
 #include "service_auth.h"
 #include "ble_beacon.h"
 
-int access_token = 12345;
 
 uint8_t char1_str[3] = {0x11,0x22,0x33};
 esp_gatt_char_prop_t a_property = 0;
