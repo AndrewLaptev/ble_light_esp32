@@ -5,7 +5,7 @@
 #include "long_write_msg.h"
 #include "connections_db.h"
 
-#define GATT_AUTH_TAG "GATT_AUTH_PROFILE"
+#define GATT_AUTH_TAG "GATT_AUTH_SERVICE"
 
 #define GATTS_SERVICE_UUID_AUTH   0x0077
 #define GATTS_CHAR_UUID_AUTH      0x7701

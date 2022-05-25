@@ -43,12 +43,12 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
 
                 if (!(sscanf(buffer, "%d", &light_level) == 0 || sscanf(buffer, "%d", &light_level) == -1)) {
                     ledc_control(light_level);
-                    ESP_LOGI(GATT_LIGHT_TAG, "Light level: %d", light_level);
+                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light level: %d", light_level);
                 } else {
-                    ESP_LOGW(GATT_LIGHT_TAG, "Incorrect light mode message!");
+                    ESP_LOGW(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Write light mode in %s: Incorrect light mode message!\n", __func__);
                 }
             } else {
-                ESP_LOGW(GATT_LIGHT_TAG, "Write light mode in %s: %s\n", __func__, err_connect_check(err));
+                ESP_LOGW(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Unauthorizade message %s: %s\n", __func__, err_connect_check(err));
             }
 
             if (gl_service_tab[SERVICE_LIGHT_APP_ID].descr_handle == param->write.handle && param->write.len == 2){

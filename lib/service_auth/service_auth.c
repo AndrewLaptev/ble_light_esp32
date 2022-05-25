@@ -81,10 +81,10 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
                 if (err == ERR_CONNECT_NOT_EXIST) {
                     show_db(&connect_db, DB_MAX_SHOW_ROWS);
                 } else {
-                    ESP_LOGW(GATT_AUTH_TAG, "Adding connection to DB in %s: %s\n", __func__, err_connect_check(err));
+                    ESP_LOGW(GATT_AUTH_TAG, "GATT_WRITE_EVT, Adding connection to DB in %s: %s\n", __func__, err_connect_check(err));
                 }
             } else {
-                ESP_LOGW(GATT_AUTH_TAG, "Incorrect access token!");
+                ESP_LOGW(GATT_AUTH_TAG, "GATT_WRITE_EVT, Adding connection to DB in %s: Incorrect access token!\n", __func__);
             }
 
             if (gl_service_tab[SERVICE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
@@ -218,7 +218,7 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         if (err == ERR_CONNECT_EXIST) {
             show_db(&connect_db, DB_MAX_SHOW_ROWS);
         } else {
-            ESP_LOGW(GATT_AUTH_TAG, "Remove connection from DB in %s: %s\n", __func__, err_connect_check(err));
+            ESP_LOGW(GATT_AUTH_TAG, "ESP_GATTS_DISCONNECT_EVT, Remove connection from DB in %s: %s\n", __func__, err_connect_check(err));
         }
 
         break;

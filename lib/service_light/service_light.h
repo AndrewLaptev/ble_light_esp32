@@ -6,7 +6,7 @@
 #include "light_control.h"
 #include "connections_db.h"
 
-#define GATT_LIGHT_TAG "GATT_LIGHT_PROFILE"
+#define GATT_LIGHT_TAG "GATT_LIGHT_SERVICE"
 
 #define GATTS_SERVICE_UUID_LIGHT   0x0088
 #define GATTS_CHAR_UUID_LIGHT      0x8801
