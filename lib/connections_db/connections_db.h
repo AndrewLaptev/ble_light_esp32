@@ -32,6 +32,7 @@ err_connect check_connection_db(connections_db *db, esp_ble_gatts_cb_param_t *pa
 const char* err_connect_check(err_connect err);
 err_connect add_connection_to_db (connections_db *db, esp_ble_gatts_cb_param_t *param);
 err_connect remove_connection_from_db (connections_db *db, esp_ble_gatts_cb_param_t *param);
+void write_light_mode_to_db(connections_db *db, esp_ble_gatts_cb_param_t *param, int light_mode);
 void show_db(connections_db *db, int sum_rows);
 
 #endif

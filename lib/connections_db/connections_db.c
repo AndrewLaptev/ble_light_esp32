@@ -65,6 +65,7 @@ err_connect remove_connection_from_db (connections_db *db, esp_ble_gatts_cb_para
         for (int i = 0; i < db->sum_connections; i++) {
             if (db->connections[i].id == param->connect.conn_id) {
                 db->connections[i].id = -1;
+                db->connections[i].light_mode = -1;
                 update_connection_pos_db(db);
             }
         }
@@ -84,4 +85,8 @@ void show_db(connections_db *db, int sum_rows) {
                 db->connections[i].id, db->connections[i].light_mode, db->pos_connection, db->sum_connections);
         }
     }
+}
+
+void write_light_mode_to_db(connections_db *db, esp_ble_gatts_cb_param_t *param, int light_mode) {
+    db->connections[param->connect.conn_id].light_mode = light_mode;
 }
