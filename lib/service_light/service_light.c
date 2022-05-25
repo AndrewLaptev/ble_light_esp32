@@ -41,7 +41,7 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
                     buffer[i] = param->write.value[i];
                 }
 
-                if (!(sscanf(buffer, "%d", &light_level) == 0 || sscanf(buffer, "%d", &light_level) == -1)) {
+                if (!(sscanf(buffer, "%d", &light_level) == 0 || sscanf(buffer, "%d", &light_level) == -1) && light_level >= 0) {
                     ledc_control(light_level);
                     ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light level: %d", light_level);
                 } else {
