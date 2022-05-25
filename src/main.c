@@ -1,6 +1,6 @@
 #include "common.h"
 #include "light_control.h"
-#include "access_db.h"
+#include "connections_db.h"
 
 #define MAIN_TAG "MAIN"
 
@@ -61,7 +61,7 @@ void app_main(void) {
 
     ledc_init();
 
-    init_connect_db(&access_db);
+    init_connect_db(&connect_db);
 
     return;
 }

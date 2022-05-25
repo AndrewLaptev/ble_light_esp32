@@ -31,8 +31,8 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         if (!param->write.is_prep){
             ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, value len %d, value :", param->write.len);
 
-            bool ans;
-            if((ans = check_connection_db(&access_db, param))) {
+            err_connect err = check_connection_db(&connect_db, param);
+            if(err == ERR_CONNECT_EXIST) {
                 char buffer[LIGHT_MSG_BUFFER_LEN];
                 memset(buffer, '\0', LIGHT_MSG_BUFFER_LEN);
                 int light_level;
@@ -48,7 +48,7 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
                     ESP_LOGW(GATT_LIGHT_TAG, "Incorrect light mode message!");
                 }
             } else {
-                ESP_LOGW(GATT_LIGHT_TAG, "Unautharized message!");
+                ESP_LOGW(GATT_LIGHT_TAG, "Write light mode in %s: %s\n", __func__, err_connect_check(err));
             }
 
             if (gl_service_tab[SERVICE_LIGHT_APP_ID].descr_handle == param->write.handle && param->write.len == 2){

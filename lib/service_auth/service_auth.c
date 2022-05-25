@@ -3,9 +3,7 @@
 bool authorization_connection(char *auth_msg, int access_token) {
     int auth_num;
     sscanf(auth_msg, "%d", &auth_num);
-    
     if (auth_num == access_token) { return true; }
-
     return false;
 }
 
@@ -76,18 +74,16 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
                 buffer[i] = param->write.value[i];
             }
 
-
-            bool ans;
-            if ((ans = authorization_connection(buffer, access_token))) {
-                if ((ans = add_connection_to_db(&access_db, param))) {
-                    show_db(&access_db, ACCESS_BD_SHOW_ROWS);
+            if (authorization_connection(buffer, access_token)) {
+                err_connect err = add_connection_to_db(&connect_db, param);
+                if (err == ERR_CONNECT_NOT_EXIST) {
+                    show_db(&connect_db, DB_MAX_SHOW_ROWS);
                 } else {
-                    ESP_LOGW(GATT_AUTH_TAG, "Connection to light service already exist in access DB!");
+                    ESP_LOGW(GATT_AUTH_TAG, "Adding connection to DB in %s: %s\n", __func__, err_connect_check(err));
                 }
             } else {
                 ESP_LOGW(GATT_AUTH_TAG, "Incorrect access token!");
             }
-
 
             if (gl_service_tab[SERVICE_AUTH_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
                 uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
@@ -216,11 +212,12 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         ESP_LOGI(GATT_AUTH_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
         esp_ble_gap_start_advertising(&adv_params);
         
-        bool ans;
-            if (!(ans = remove_connection_from_db(&access_db, param))) {
-                ESP_LOGW(GATT_AUTH_TAG, "Failed remove connection from access DB!");
-            }
-        show_db(&access_db, ACCESS_BD_SHOW_ROWS);
+        err_connect err = remove_connection_from_db(&connect_db, param);
+        if (err == ERR_CONNECT_EXIST) {
+            show_db(&connect_db, DB_MAX_SHOW_ROWS);
+        } else {
+            ESP_LOGW(GATT_AUTH_TAG, "Remove connection from DB in %s: %s\n", __func__, err_connect_check(err));
+        }
 
         break;
     case ESP_GATTS_CONF_EVT:
