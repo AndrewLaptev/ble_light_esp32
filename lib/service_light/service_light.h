@@ -5,6 +5,7 @@
 #include "long_write_msg.h"
 #include "light_control.h"
 #include "connections_db.h"
+#include "string.h"
 
 #define GATT_LIGHT_TAG "GATT_LIGHT_SERVICE"
 

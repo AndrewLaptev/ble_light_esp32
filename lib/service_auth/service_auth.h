@@ -14,7 +14,7 @@
 
 #define AUTH_MSG_BUFFER_LEN       50
 
-#define ACCESS_TOKEN_VAL          12345
+#define ACCESS_TOKEN_VAL          1
 
 int access_token;
 

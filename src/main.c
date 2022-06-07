@@ -60,8 +60,8 @@ void app_main(void) {
     }
 
     ledc_init();
-
+    ledc_fade_control((1 << LEDC_DUTY_RESOLUTION), (1 << LEDC_DUTY_RESOLUTION));
     init_connect_db(&connect_db);
-
+    
     return;
 }
