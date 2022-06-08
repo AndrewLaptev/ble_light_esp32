@@ -28,20 +28,31 @@ light_mode_t consensus_light_set(connections_db_t *db) {
 }
 
 bool parser_light_mode(char *buffer, int *input_brightness, int *input_color_temp) {
-    char *buff_arr[2];
-    
-    buff_arr[0] = strtok(buffer, "/");
-    buff_arr[1] = strtok(NULL, "/");
+    char *buff_arr[PARSER_BUFF_ARR_MAX_LEN];
+    char *token;
+    int buff_arr_idx = 0;
+    bool check_brightness = false;
+    bool check_color_temp = false;
 
-    bool check_brightness = (!(sscanf(buff_arr[0], "%d", input_brightness) == 0 || sscanf(buff_arr[0], "%d", input_brightness) == -1) 
-                                && *input_brightness >= 0);
-    bool check_color_temp = (!(sscanf(buff_arr[1], "%d", input_color_temp) == 0 || sscanf(buff_arr[1], "%d", input_color_temp) == -1) 
-                                && *input_color_temp >= 0);
-    
-    if (check_brightness && check_color_temp) {
-        return true;
+    token = strtok(buffer, "/");
+    buff_arr[buff_arr_idx] = token;
+
+    while(token != NULL) {
+        buff_arr_idx++;
+        token = strtok(NULL, "/");
+        buff_arr[buff_arr_idx] = token;
     }
 
+    if (buff_arr_idx == PARSER_BUFF_ARR_MAX_LEN) {
+        check_brightness = (!(sscanf(buff_arr[0], "%d", input_brightness) == 0 || sscanf(buff_arr[0], "%d", input_brightness) == -1) 
+                                    && *input_brightness >= 0);
+        check_color_temp = (!(sscanf(buff_arr[1], "%d", input_color_temp) == 0 || sscanf(buff_arr[1], "%d", input_color_temp) == -1) 
+                                    && ((*input_color_temp >= LEDC_COLOR_TEMP_MIN && *input_color_temp <= LEDC_COLOR_TEMP_MAX)
+                                    || *input_color_temp == 0));
+        if (check_brightness && check_color_temp) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -88,23 +99,26 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
                 }
 
                 if (parser_light_mode(buffer, &input_brightness, &input_color_temp)) {
-                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light mode msg - br:%d tmp:%d\n", input_brightness, input_color_temp);
+                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light mode msg - br:%d tmp:%d", input_brightness, input_color_temp);
                     ledc_set_brightness(input_brightness, &light_mode);
                     ledc_set_color(input_color_temp, &light_mode);
                     
                     write_light_mode_to_db(&connect_db, param, &light_mode);
                     show_db(&connect_db, DB_MAX_SHOW_ROWS);
 
-                    light_mode_t light_mode_cons = consensus_light_set(&connect_db);
+                    light_mode_cons = consensus_light_set(&connect_db);
 
                     ledc_fade_control(light_mode_cons.light_warm_duty, light_mode_cons.light_cold_duty);
-                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode - br:%d tmp:%d\n",
+                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode - br:%d tmp:%d",
                                             light_mode_cons.light_brightness, light_mode_cons.color_temperature);
                 } else {
-                    ESP_LOGW(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Write light mode in %s: Incorrect light mode message!\n", __func__);
+                    show_db(&connect_db, DB_MAX_SHOW_ROWS);
+                    ESP_LOGW(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Write light mode in %s: Incorrect light mode message!", __func__);
+                    ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode - br:%d tmp:%d",
+                                            light_mode_cons.light_brightness, light_mode_cons.color_temperature);
                 }
             } else {
-                ESP_LOGW(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Unauthorizade message %s: %s\n", __func__, err_connect_check(err));
+                ESP_LOGW(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Unauthorizade message %s: %s", __func__, err_connect_check(err));
             }
 
             if (gl_service_tab[SERVICE_LIGHT_APP_ID].descr_handle == param->write.handle && param->write.len == 2){
@@ -217,12 +231,12 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         err_connect err = remove_connection_from_db(&connect_db, param);
         if (err == ERR_CONNECT_EXIST) {
             show_db(&connect_db, DB_MAX_SHOW_ROWS);
-            light_mode_t light_mode_cons = consensus_light_set(&connect_db);
+            light_mode_cons = consensus_light_set(&connect_db);
             ledc_fade_control(light_mode_cons.light_warm_duty, light_mode_cons.light_cold_duty);
-            ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode - br:%d tmp:%d\n",
+            ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode - br:%d tmp:%d",
                                             light_mode_cons.light_brightness, light_mode_cons.color_temperature);
         } else {
-            ESP_LOGW(GATT_LIGHT_TAG, "ESP_GATTS_DISCONNECT_EVT, Remove connection from DB in %s: %s\n", __func__, err_connect_check(err));
+            ESP_LOGW(GATT_LIGHT_TAG, "ESP_GATTS_DISCONNECT_EVT, Remove connection from DB in %s: %s", __func__, err_connect_check(err));
         }
         break;
     case ESP_GATTS_OPEN_EVT:

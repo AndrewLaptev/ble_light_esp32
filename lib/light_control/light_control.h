@@ -20,8 +20,8 @@
  * There may be flickering and fading
 */
 
-#define LEDC_COLOR_TEMP_MIN      2700
-#define LEDC_COLOR_TEMP_MAX      6500
+#define LEDC_COLOR_TEMP_MIN      2700 // effective 3300
+#define LEDC_COLOR_TEMP_MAX      6500 // effective 5950
 
 #define LEDC_CH_NUM              (2)
 #define LEDC_FADE_TIME           (1000)
@@ -34,6 +34,7 @@ typedef struct {
     int light_brightness;       // 0 to 100
     int color_temperature;
 } light_mode_t;
+
 
 void ledc_init(void);
 void ledc_fade_control(uint32_t warm_duty, uint32_t cold_duty);
