@@ -14,18 +14,19 @@
 
 /*
  * True values: from 2700 to 6500 kelvins
- * But in real this values may be incorrect because 
- * 
- * 
+ * But in real this values may be incorrect.
+ * Because the voltage on the lamps may not 
+ * be enough for normal light. 
+ * There may be flickering and fading
 */
 
 #define LEDC_COLOR_TEMP_MIN      2700
 #define LEDC_COLOR_TEMP_MAX      6500
 
-#define LEDC_CH_NUM            (2)
-#define LEDC_FADE_TIME         (1000)
+#define LEDC_CH_NUM              (2)
+#define LEDC_FADE_TIME           (1000)
 
-#define LEDC_TAG               "LEDC"
+#define LEDC_TAG                 "LEDC"
 
 typedef struct {
     uint32_t light_warm_duty;
