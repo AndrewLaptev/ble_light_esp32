@@ -1,7 +1,7 @@
 #include "connections_db.h"
 
 connections_db_t connect_db = {
-    .pos_connection = 0,
+    .cursor_connection = 0,
     .sum_connections = DB_MAX_CONNECTIONS
 };
 
@@ -18,7 +18,7 @@ void init_connect_db(connections_db_t *db) {
 void update_connection_pos_db(connections_db_t *db) {
     for (int i = 0; i < db->sum_connections; i++) {
         if (db->connections[i].id == -1) {
-            db->pos_connection = i;
+            db->cursor_connection = i;
             break;
         }
     }
@@ -54,7 +54,7 @@ err_connect add_connection_to_db (connections_db_t *db, esp_ble_gatts_cb_param_t
     err = check_connection_db(db, param);
 
     if (err == ERR_CONNECT_NOT_EXIST) {
-        db->connections[db->pos_connection].id = param->connect.conn_id;
+        db->connections[db->cursor_connection].id = param->connect.conn_id;
         update_connection_pos_db(db);
     }
     return err;
@@ -80,19 +80,22 @@ err_connect remove_connection_from_db (connections_db_t *db, esp_ble_gatts_cb_pa
 }
 
 void show_db(connections_db_t *db, int sum_rows) {
+    ESP_LOGI(DB_TAG, "\n");
+    ESP_LOGI(DB_TAG, "CONNECT_DATABASE:");
     if (sum_rows == -1){
         for (int i = 0; i < db->sum_connections; i++) {
-            ESP_LOGI(DB_TAG, "connection: %d, color_temp: %d, brightness: %d, position: %d, sum connections: %d", 
+            ESP_LOGI(DB_TAG, "connection: %d, color_temp: %d, brightness: %d, cursor: %d, sum connections: %d", 
                 db->connections[i].id, db->connections[i].light_mode.color_temperature, db->connections[i].light_mode.light_brightness, 
-                db->pos_connection, db->sum_connections);
+                db->cursor_connection, db->sum_connections);
         }
     } else {
         for (int i = 0; i < sum_rows; i++) {
-            ESP_LOGI(DB_TAG, "connection: %d, color_temp: %d, brightness: %d, position: %d, sum connections: %d", 
+            ESP_LOGI(DB_TAG, "connection: %d, color_temp: %d, brightness: %d, cursor: %d, sum connections: %d", 
                 db->connections[i].id, db->connections[i].light_mode.color_temperature, db->connections[i].light_mode.light_brightness, 
-                db->pos_connection, db->sum_connections);
+                db->cursor_connection, db->sum_connections);
         }
     }
+    ESP_LOGI(DB_TAG, "\n");
 }
 
 void write_light_mode_to_db(connections_db_t *db, esp_ble_gatts_cb_param_t *param, light_mode_t *light_mode) {

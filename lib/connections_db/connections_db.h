@@ -21,7 +21,7 @@ typedef struct {
 } connection_t;
 
 typedef struct {
-    int pos_connection;
+    int cursor_connection;
     int sum_connections;
     connection_t connections[DB_MAX_CONNECTIONS];
 } connections_db_t;
