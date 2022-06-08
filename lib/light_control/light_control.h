@@ -21,7 +21,7 @@
 */
 
 #define LEDC_COLOR_TEMP_MIN      2700 // effective 3400
-#define LEDC_COLOR_TEMP_MAX      6500 // effective 5950
+#define LEDC_COLOR_TEMP_MAX      6500 // effective 5900
 
 #define LEDC_CH_NUM              (2)
 #define LEDC_FADE_TIME           (1000)
