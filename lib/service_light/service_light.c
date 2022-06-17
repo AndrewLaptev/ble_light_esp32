@@ -153,16 +153,14 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
                 }else{
                     ESP_LOGE(GATT_LIGHT_TAG, "unknown value");
                 }
-
             }
         }
-        example_write_event_env(gatts_if, &light_prepare_write_env, param);
+        esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
         break;
     }
     case ESP_GATTS_EXEC_WRITE_EVT:
-        ESP_LOGI(GATT_LIGHT_TAG,"ESP_GATTS_EXEC_WRITE_EVT");
+        ESP_LOGW(GATT_LIGHT_TAG,"ESP_GATTS_EXEC_WRITE_EVT, Too long message");
         esp_ble_gatts_send_response(gatts_if, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
-        example_exec_write_event_env(&light_prepare_write_env, param);
         break;
     case ESP_GATTS_MTU_EVT:
         ESP_LOGI(GATT_LIGHT_TAG, "ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);

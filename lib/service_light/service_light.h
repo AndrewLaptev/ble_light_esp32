@@ -2,7 +2,6 @@
 #define _SERVICE_LIGHT_H_
 
 #include "common.h"
-#include "long_write_msg.h"
 #include "light_control.h"
 #include "connections_db.h"
 #include "string.h"
