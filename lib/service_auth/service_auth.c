@@ -22,32 +22,18 @@ void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t 
         if (set_dev_name_ret){
             ESP_LOGE(GATT_AUTH_TAG, "set device name failed, error code = %x", set_dev_name_ret);
         }
-#ifdef CONFIG_SET_RAW_ADV_DATA
-        esp_err_t raw_adv_ret = esp_ble_gap_config_adv_data_raw(raw_adv_data, sizeof(raw_adv_data));
-        if (raw_adv_ret){
-            ESP_LOGE(GATT_AUTH_TAG, "config raw adv data failed, error code = %x ", raw_adv_ret);
-        }
-        adv_config_done |= adv_config_flag;
-        esp_err_t raw_scan_ret = esp_ble_gap_config_scan_rsp_data_raw(raw_scan_rsp_data, sizeof(raw_scan_rsp_data));
-        if (raw_scan_ret){
-            ESP_LOGE(GATT_AUTH_TAG, "config raw scan rsp data failed, error code = %x", raw_scan_ret);
-        }
-        adv_config_done |= scan_rsp_config_flag;
-#else
         //config adv data
         esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
         if (ret){
             ESP_LOGE(GATT_AUTH_TAG, "config adv data failed, error code = %x", ret);
         }
-        adv_config_done |= adv_config_flag;
+        adv_config_done |= ADV_CONFIG_FLAG;
         //config scan response data
         ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
         if (ret){
             ESP_LOGE(GATT_AUTH_TAG, "config scan response data failed, error code = %x", ret);
         }
-        adv_config_done |= scan_rsp_config_flag;
-
-#endif
+        adv_config_done |= SCAN_RSP_CONFIG_FLAG;
         esp_ble_gatts_create_service(gatts_if, &gl_service_tab[SERVICE_AUTH_APP_ID].service_id, GATTS_NUM_HANDLE_AUTH);
         break;
     case ESP_GATTS_READ_EVT: {

@@ -1,8 +1,6 @@
 #include "common.h"
 #include "service_light.h"
 #include "service_auth.h"
-#include "ble_beacon.h"
-
 
 uint8_t char1_str[3] = {0x11,0x22,0x33};
 esp_gatt_char_prop_t a_property = 0;
@@ -15,16 +13,6 @@ esp_attr_value_t gatts_demo_char1_val = {
 
 uint8_t adv_config_done = 0;
 
-#ifdef CONFIG_SET_RAW_ADV_DATA
-uint8_t raw_adv_data = {
-        0x02, 0x01, 0x06,
-        0x02, 0x0a, 0xeb, 0x03, 0x03, 0xab, 0xcd
-};
-uint8_t raw_scan_rsp_data = {
-        0x0f, 0x09, 0x45, 0x53, 0x50, 0x5f, 0x47, 0x41, 0x54, 0x54, 0x53, 0x5f, 0x44,
-        0x45, 0x4d, 0x4f
-};
-#else
 uint8_t adv_service_uuid128[32] = {
     /* LSB <--------------------------------------------------------------------------------> MSB */
     //first uuid, 16bit, [12],[13] is the value (Light manage)
@@ -90,39 +78,22 @@ struct gatts_service_inst gl_service_tab[SERVICE_NUM] = {
         .gatts_if = ESP_GATT_IF_NONE,       /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
     },
 };
-#endif /* CONFIG_SET_RAW_ADV_DATA */
-
 
 void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
     esp_err_t err;
     switch (event) {
-#ifdef CONFIG_SET_RAW_ADV_DATA
-    case ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT:
-        adv_config_done &= (~adv_config_flag);
-        if (adv_config_done==0){
-            esp_ble_gap_start_advertising(&adv_params);
-        }
-        break;
-    case ESP_GAP_BLE_SCAN_RSP_DATA_RAW_SET_COMPLETE_EVT:
-        adv_config_done &= (~scan_rsp_config_flag);
-        if (adv_config_done==0){
-            esp_ble_gap_start_advertising(&adv_params);
-        }
-        break;
-#else
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
-        adv_config_done &= (~adv_config_flag);
+        adv_config_done &= (~ADV_CONFIG_FLAG);
         if (adv_config_done == 0){
             esp_ble_gap_start_advertising(&adv_params);
         }
         break;
     case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT:
-        adv_config_done &= (~scan_rsp_config_flag);
+        adv_config_done &= (~SCAN_RSP_CONFIG_FLAG);
         if (adv_config_done == 0){
             esp_ble_gap_start_advertising(&adv_params);
         }
         break;
-#endif
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
         //advertising start complete event to indicate advertising start successfully or failed
         if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
@@ -151,44 +122,12 @@ void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
 #endif
         break;
     }
-    case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
-#if (IBEACON_MODE == IBEACON_RECEIVER)
-        //the unit of the duration is second, 0 means scan permanently
-        uint32_t duration = 0;
-        esp_ble_gap_start_scanning(duration);
-#endif
-        break;
-    }
     case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
         //scan start complete event to indicate scan start successfully or failed
         if ((err = param->scan_start_cmpl.status) != ESP_BT_STATUS_SUCCESS) {
             ESP_LOGE(GAP_HANDLER_TAG, "Scan start failed: %s", esp_err_to_name(err));
         }
         break;
-    case ESP_GAP_BLE_SCAN_RESULT_EVT: {
-        esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
-        switch (scan_result->scan_rst.search_evt) {
-        case ESP_GAP_SEARCH_INQ_RES_EVT:
-            /* Search for BLE iBeacon Packet */
-            if (esp_ble_is_ibeacon_packet(scan_result->scan_rst.ble_adv, scan_result->scan_rst.adv_data_len)){
-                esp_ble_ibeacon_t *ibeacon_data = (esp_ble_ibeacon_t*)(scan_result->scan_rst.ble_adv);
-                ESP_LOGI(GAP_HANDLER_TAG, "----------iBeacon Found----------");
-                esp_log_buffer_hex("IBEACON_DEMO: Device address:", scan_result->scan_rst.bda, ESP_BD_ADDR_LEN );
-                esp_log_buffer_hex("IBEACON_DEMO: Proximity UUID:", ibeacon_data->ibeacon_vendor.proximity_uuid, ESP_UUID_LEN_128);
-
-                uint16_t major = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.major);
-                uint16_t minor = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.minor);
-                ESP_LOGI(GAP_HANDLER_TAG, "Major: 0x%04x (%d)", major, major);
-                ESP_LOGI(GAP_HANDLER_TAG, "Minor: 0x%04x (%d)", minor, minor);
-                ESP_LOGI(GAP_HANDLER_TAG, "Measured power (RSSI at a 1m distance):%d dbm", ibeacon_data->ibeacon_vendor.measured_power);
-                ESP_LOGI(GAP_HANDLER_TAG, "RSSI of packet:%d dbm", scan_result->scan_rst.rssi);
-            }
-            break;
-        default:
-            break;
-        }
-        break;
-    }
     case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
         if ((err = param->scan_stop_cmpl.status) != ESP_BT_STATUS_SUCCESS){
             ESP_LOGE(GAP_HANDLER_TAG, "Scan stop failed: %s", esp_err_to_name(err));

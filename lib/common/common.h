@@ -33,8 +33,8 @@
 #define GATTS_HANDLER_TAG           "GATTS_HANDLER"
 #define GAP_HANDLER_TAG             "GAP_HANDLER"
 
-#define adv_config_flag             (1 << 0)
-#define scan_rsp_config_flag        (1 << 1)
+#define ADV_CONFIG_FLAG             (1 << 0)
+#define SCAN_RSP_CONFIG_FLAG        (1 << 1)
 
 uint8_t char1_str[3];
 esp_gatt_char_prop_t a_property;
@@ -42,15 +42,9 @@ esp_gatt_char_prop_t b_property;
 esp_attr_value_t gatts_demo_char1_val;
 
 uint8_t adv_config_done;
-
-#ifdef CONFIG_SET_RAW_ADV_DATA
-uint8_t raw_adv_data[];
-uint8_t raw_scan_rsp_data[];
-#else
 uint8_t adv_service_uuid128[32];
 esp_ble_adv_data_t adv_data;
 esp_ble_adv_data_t scan_rsp_data;
-#endif
 
 esp_ble_adv_params_t adv_params;
 
