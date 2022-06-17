@@ -78,7 +78,4 @@ void ledc_set_color(uint32_t color_temperature, light_mode_t *light_mode) {
     
     light_mode->light_cold_duty = (int)(coeff_brightnes * ((color_temperature - LEDC_COLOR_TEMP_MIN) * (1 << LEDC_DUTY_RESOLUTION)
                                     / (LEDC_COLOR_TEMP_MAX - LEDC_COLOR_TEMP_MIN)));
-
-    ESP_LOGI("TEST_IN", "warm: %d", light_mode->light_warm_duty);
-    ESP_LOGI("TEST_IN", "cold: %d", light_mode->light_cold_duty);
 }
