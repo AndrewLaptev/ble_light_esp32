@@ -229,15 +229,14 @@ void gatts_profile_light_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         esp_ble_gap_start_advertising(&adv_params);
         
         err_connect err = remove_connection_from_db(&connect_db, param);
-        if (err == ERR_CONNECT_EXIST) {
-            show_db(&connect_db, DB_MAX_SHOW_ROWS);
-            light_mode_cons = consensus_light_set(&connect_db);
-            ledc_fade_control(light_mode_cons.light_warm_duty, light_mode_cons.light_cold_duty);
-            ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode - br:%d tmp:%d",
-                                            light_mode_cons.light_brightness, light_mode_cons.color_temperature);
-        } else {
+        if (err == ERR_CONNECT_NOT_EXIST) {
             ESP_LOGW(GATT_LIGHT_TAG, "ESP_GATTS_DISCONNECT_EVT, Remove connection from DB in %s: %s", __func__, err_connect_check(err));
         }
+        show_db(&connect_db, DB_MAX_SHOW_ROWS);
+        light_mode_cons = consensus_light_set(&connect_db);
+        ledc_fade_control(light_mode_cons.light_warm_duty, light_mode_cons.light_cold_duty);
+        ESP_LOGI(GATT_LIGHT_TAG, "GATT_WRITE_EVT, Light consensus mode - br:%d tmp:%d",
+                                        light_mode_cons.light_brightness, light_mode_cons.color_temperature);
         break;
     case ESP_GATTS_OPEN_EVT:
     case ESP_GATTS_CANCEL_OPEN_EVT:
