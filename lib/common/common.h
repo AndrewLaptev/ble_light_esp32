@@ -18,13 +18,17 @@
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
 
-
+////////////////////////MAIN OPTIONS////////////////////////
 #define DEVICE_NAME                 "ESP_LIGHT_NODE"
+#define ACCESS_TOKEN_VAL            12345                 // use another values!
+#define DB_MAX_CONNECTIONS          5
+#define LEDC_COLOR_TEMP_MIN         2700                  // effective 3400
+#define LEDC_COLOR_TEMP_MAX         6500                  // effective 5900
+////////////////////////////////////////////////////////////
+
 #define MANUFACTURER_DATA_LEN       17
 
 #define GATTS_DEMO_CHAR_VAL_LEN_MAX 0x40
-
-#define PREPARE_BUF_MAX_SIZE        1024
 
 #define SERVICE_NUM                 2
 #define SERVICE_AUTH_APP_ID         0

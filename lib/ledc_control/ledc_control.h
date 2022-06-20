@@ -4,14 +4,6 @@
 #include "common.h"
 #include "driver/ledc.h"
 
-#define LEDC_HS_TIMER            LEDC_TIMER_0
-#define LEDC_HS_MODE             LEDC_HIGH_SPEED_MODE
-#define LEDC_WARM_CH0_GPIO       GPIO_NUM_22
-#define LEDC_COLD_CH1_GPIO       GPIO_NUM_23
-#define LEDC_HS_CH0_CHANNEL      LEDC_CHANNEL_0
-#define LEDC_HS_CH1_CHANNEL      LEDC_CHANNEL_1
-#define LEDC_DUTY_RESOLUTION     LEDC_TIMER_13_BIT
-
 /*
  * True values: from 2700 to 6500 kelvins
  * But in real this values may be incorrect.
@@ -20,8 +12,13 @@
  * There may be flickering and fading
 */
 
-#define LEDC_COLOR_TEMP_MIN      2700 // effective 3400
-#define LEDC_COLOR_TEMP_MAX      6500 // effective 5900
+#define LEDC_HS_TIMER            LEDC_TIMER_0
+#define LEDC_HS_MODE             LEDC_HIGH_SPEED_MODE
+#define LEDC_WARM_CH0_GPIO       GPIO_NUM_22
+#define LEDC_COLD_CH1_GPIO       GPIO_NUM_23
+#define LEDC_HS_CH0_CHANNEL      LEDC_CHANNEL_0
+#define LEDC_HS_CH1_CHANNEL      LEDC_CHANNEL_1
+#define LEDC_DUTY_RESOLUTION     LEDC_TIMER_13_BIT
 
 #define LEDC_CH_NUM              (2)
 #define LEDC_FADE_TIME           (1000)

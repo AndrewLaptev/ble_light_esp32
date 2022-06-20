@@ -6,7 +6,6 @@
 
 #define DB_TAG                     "CONNECTIONS_DB"
 
-#define DB_MAX_CONNECTIONS         5
 #define DB_MAX_SHOW_ROWS          -1 // -1 show all DB rows
 
 #define ERR_CONNECT_EXIST          0
