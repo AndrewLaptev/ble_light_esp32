@@ -1,5 +1,5 @@
 #include "common.h"
-#include "light_control.h"
+#include "ledc_control.h"
 #include "connections_db.h"
 
 #define MAIN_TAG "MAIN"

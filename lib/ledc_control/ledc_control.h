@@ -1,5 +1,5 @@
-#ifndef _LIGHT_CONTROL_H_
-#define _LIGHT_CONTROL_H_
+#ifndef _LEDC_CONTROL_H_
+#define _LEDC_CONTROL_H_
 
 #include "common.h"
 #include "driver/ledc.h"

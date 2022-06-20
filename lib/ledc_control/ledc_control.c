@@ -1,4 +1,4 @@
-#include "light_control.h"
+#include "ledc_control.h"
 
 
 ledc_timer_config_t ledc_timer = {

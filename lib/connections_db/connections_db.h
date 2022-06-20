@@ -2,7 +2,7 @@
 #define _CONNECTIONS_DB_H_
 
 #include "common.h"
-#include "light_control.h"
+#include "ledc_control.h"
 
 #define DB_TAG                     "CONNECTIONS_DB"
 
