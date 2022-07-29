@@ -1,26 +1,33 @@
-menu "iBeacon Configuration"
+menu "BLightESP32 Configuration"
 
-    choice IBEACON_MODE
-        bool "iBeacon Mode"
-        default IBEACON_SENDER
+    config DEVICE_NAME
+        string "Device name"
+        default "ESP_LIGHT_NODE"
         help
-            Select the iBeacon Mode.
+            Bluetooth name for device
 
-        config IBEACON_SENDER
-            bool "iBeacon Sender Mode"
-            help
-                Select the iBeacon Sender Mode.
+    config ACCESS_TOKEN
+        int "Access token"
+        default 12345
+        help
+            Access token authorization for light manage
 
-        config IBEACON_RECEIVER
-            bool "iBeacon Receiver Mode"
-            help
-                Select the iBeacon Receiver Mode.
+    config DB_MAX_CONNECTIONS
+        int "Max DB connections size"
+        default 5
+        help
+            Max connections to light manage (max DB connections size)
 
-    endchoice
+    config LEDC_COLOR_TEMP_MIN
+        int "MIN color temperature"
+        default 2700
+        help
+            Minimum color temperature for LED
 
-    config IBEACON_MODE
-        int
-        default 0 if IBEACON_SENDER
-        default 1 if IBEACON_RECEIVER
+    config LEDC_COLOR_TEMP_MAX
+        int "MAX color temperature"
+        default 6500
+        help
+            Maximum color temperature for LED
 
 endmenu

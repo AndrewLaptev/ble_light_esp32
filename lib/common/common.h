@@ -19,11 +19,11 @@
 #include "esp_gatt_common_api.h"
 
 ////////////////////////MAIN OPTIONS////////////////////////
-#define DEVICE_NAME                 "ESP_LIGHT_NODE"
-#define ACCESS_TOKEN_VAL            12345                 // use another values!
-#define DB_MAX_CONNECTIONS          5
-#define LEDC_COLOR_TEMP_MIN         2700                  // effective 3400
-#define LEDC_COLOR_TEMP_MAX         6500                  // effective 5900
+#define DEVICE_NAME                 CONFIG_DEVICE_NAME
+#define ACCESS_TOKEN_VAL            CONFIG_ACCESS_TOKEN
+#define DB_MAX_CONNECTIONS          CONFIG_DB_MAX_CONNECTIONS
+#define LEDC_COLOR_TEMP_MIN         CONFIG_LEDC_COLOR_TEMP_MIN                  // effective 3400
+#define LEDC_COLOR_TEMP_MAX         CONFIG_LEDC_COLOR_TEMP_MAX                  // effective 5900
 ////////////////////////////////////////////////////////////
 
 #define MANUFACTURER_DATA_LEN       17
