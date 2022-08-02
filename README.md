@@ -10,39 +10,9 @@
 <h3 align="center">BLightESP32</h3>
 
   <p align="center">
-    Приложение для управления лампой через микроконтроллер ESP32 по Bluetooth с помощью мобильного приложения
-    <br />
-    <a href="https://github.com/AndrewLaptev/ble_light_mobile"><strong>ble_light_mobile</strong></a>
-    <br />
+    Программный модуль нормализации психоэмоционального состояния и персонализации окружающей среды через искусственное освещение
   </p>
 </div>
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
 
 
 <!-- ABOUT THE PROJECT -->
@@ -50,7 +20,7 @@
 
 Данное приложение позволяет управлять цветовой температурой и яркостью светодидодной лампы через ШИМ. Управление осуществляется через мобильное приложение [BLight](https://github.com/AndrewLaptev/ble_light_mobile) по Bluetooth Low Energy.
 
-**Features**:
+### Features:
 * обеспечение работы сразу нескольких клиентов, подключенных через мобильное приложение BLight
 * управление режимом света исходя из предпочтений всех подключенных клиентов (консенсус)
 * плавное управление яркостью и цветовой температурой
@@ -61,6 +31,12 @@
 * [![ESP-IDF][esp-idf-shield]][esp-idf-url]
 * [![Cmake][cmake-shield]][cmake-url]
 * [![PlatformIO][platformio-shield]][platformio-url]
+
+### Requirements
+* ESP32 WROOM DevKit v1 или ESP32 Wemods D1 mini
+* OC Ubuntu/Windows
+* VScode
+* Platformio
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -76,104 +52,36 @@
 
 ### Prerequisites
 
-1. Скачиваем и устанавливаем [VScode](https://code.visualstudio.com/download)
+1. Скачать и установить [VScode](https://code.visualstudio.com/download)
 
-2. В VScode переходим в раздел `Extensions` (расширения), находим PlatformIO и устанавливаем
+2. В VScode перейти в раздел `Extensions` (расширения), и установить PlatformIO
 
-3. Открываем `PlatformIO->Platforms->Embedded` и в строке поиска пишем `Espressif` и из результатов выбираем `Espressif 32`, устанавливаем версию 4.2.0 (можно и самую новую, но могут возникнуть проблемы с совместимостью)
+3. Открыть `PlatformIO->Platforms->Embedded` и в строке поиска указать `Espressif`, из результатов выбрать `Espressif 32`, установить версию 4.2.0 (можно и самую новую, но могут возникнуть проблемы с совместимостью)
 
-4. Устанавливаем [правила](https://docs.platformio.org/en/latest/core/installation/udev-rules.html) подсистемы udev для поддерживаемых устройств PlatformIO  
+4. Установвить [правила](https://docs.platformio.org/en/latest/core/installation/udev-rules.html) подсистемы udev для поддерживаемых устройств PlatformIO
 
 ### Installation
 
-1. Клонируем репозиторий
+1. Клонировать репозиторий
    ```sh
    git clone https://github.com/AndrewLaptev/ble_light_esp32
    ```
+2. Открыть скачанный репозиторий в VScode, расширение PlatformIO должно обнаружить проект и открыть доп.функционал в интерфейсе VScode
 
-2. Открываем скачанный репозиторий в VScode, расширение PlatformIO должно обнаружить проект и открыть доп.функционал в интерфейсе VScode
-
-3. Если нужно настроить проект для сборки, то открываем терминал `PlatformIO:New Terminal` и вводим команду для открытия меню конфигурации проекта
+3. Если нужно настроить проект для сборки, то открыть терминал `PlatformIO:New Terminal` и ввести команду для открытия меню конфигурации проекта
    ```sh
    pio run -t menuconfig
    ```
-4. Подключаем микроконтроллер ESP32 к компьютеру и выбираем `PlatformIO:Upload`. После компиляции и загрузки прошивки вывод ее работы будет отображаться в мониторе последовательного вывода
+4. Подключить микроконтроллер ESP32 к компьютеру и выбрать `PlatformIO:Upload`. После компиляции и загрузки прошивки вывод ее работы будет отображаться в мониторе последовательного вывода
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
-
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTACT -->
-## Contact
-
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
-
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-
-* []()
-* []()
-* []()
+Приложение разработано в рамках НИР "Разработка механизмов проекцирования процессов жизнедеятельности пользователей в экосистему их цифровых ассистентов" №621308
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
