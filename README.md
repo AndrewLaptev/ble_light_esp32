@@ -10,7 +10,7 @@
 <h3 align="center">BLightESP32</h3>
 
   <p align="center">
-    Программный модуль нормализации психоэмоционального состояния и персонализации окружающей среды через искусственное освещение
+    Software module for normalization of the psycho-emotional state and personalization of the environment through artificial lighting
   </p>
 </div>
 
@@ -18,13 +18,13 @@
 <!-- ABOUT THE PROJECT -->
 ## About
 
-Данное приложение позволяет управлять цветовой температурой и яркостью светодиодной лампы через ШИМ. Управление осуществляется через мобильное приложение [BLight](https://github.com/AndrewLaptev/ble_light_mobile) по Bluetooth Low Energy.
+This application allows you to control the color temperature and brightness of the LED lamp via PWM. Management is carried out through the mobile application [BLight](https://github.com/AndrewLaptev/ble_light_mobile) via Bluetooth Low Energy.
 
 ### Features:
-* обеспечение работы сразу нескольких клиентов, подключенных через мобильное приложение BLight
-* управление режимом света исходя из предпочтений всех подключенных клиентов (консенсус)
-* плавное управление яркостью и цветовой температурой
-* авторизация через токен подключенных по GATT клиентов для доступа к сервису управления световыми режимами
+* ensuring the work of several clients connected through the BLight mobile application at once
+* control of the light mode based on the preferences of all connected clients (consensus)
+* smooth brightness and color temperature control
+* authorization via a token of GATT-connected clients to access the light mode management service
 
 ### Built With
 
@@ -44,78 +44,78 @@
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Для запуска приложения необходимо один или несколько микроконтроллеров ESP32 WROOM DevKit v1 (или ESP32 Wemods D1 mini), а также ПК под управлением ОС Ubuntu или Windows
+To run the application, you need one or more ESP32 WROOM DevKit v1 (или ESP32 Wemods D1 mini) microcontrollers, as well as a PC running Ubuntu or Windows OS
 
-Использование PlatformIO и ESP-IDF возможно как отдельно, так и в качестве интеграции с различными IDE или текстовыми редакторами. 
+The use of PlatformIO and ESP-IDF is possible both separately and as an integration with various IDE or text editors.
 
-В данном руководстве будет рассмотрен вариант установки **PlatformIO + ESP-IDF + VSCode на ОС Ubuntu**
+This guide will consider the option of installing **PlatformIO + ESP-IDF + VSCode на ОС Ubuntu**
 
 ### Prerequisites
 
-1. Скачать и установить [VScode](https://code.visualstudio.com/download)
+1. Download and install [VScode](https://code.visualstudio.com/download)
 
-2. В VScode перейти в раздел `Extensions` (расширения), и установить PlatformIO
+2. In VSCode, go to the `Extensions` section and install PlatformIO
 
-3. Открыть `PlatformIO->Platforms->Embedded` и в строке поиска указать `Espressif`, из результатов выбрать `Espressif 32`, установить версию 4.2.0 (можно и самую новую, но могут возникнуть проблемы с совместимостью)
+3. Open `PlatformIO->Platforms->Embedded` and specify `Expressif` in the search bar, select `Expressif 32` from the results, install version 4.2.0 (you can also install the newest one, but compatibility problems may arise)
 
-4. Установвить [правила](https://docs.platformio.org/en/latest/core/installation/udev-rules.html) подсистемы udev для поддерживаемых устройств PlatformIO
+4. Install [rules](https://docs.platformio.org/en/latest/core/installation/udev-rules.html) udev subsystems for supported PlatformIO devices
 
 ### Installation
 
-1. Клонировать репозиторий
+1. Clone a repository
    ```sh
    git clone https://github.com/AndrewLaptev/ble_light_esp32
    ```
-2. Открыть скачанный репозиторий в VScode, расширение PlatformIO должно обнаружить проект и открыть доп.функционал в интерфейсе VScode
+2. Open the downloaded repository in VSCode, the PlatformIO extension should detect the project and open additional functionality in the VSCode interface
 
-3. Если нужно настроить проект для сборки, то открыть терминал `PlatformIO:New Terminal` и ввести команду для открытия меню конфигурации проекта
+3. If you need to configure the project for assembly, then open the `PlatformIO:New Terminal` and enter a command to open the project configuration menu
    ```sh
    pio run -t menuconfig
    ```
-4. Подключить микроконтроллер ESP32 к компьютеру и выбрать `PlatformIO:Upload`. После компиляции и загрузки прошивки вывод ее работы будет отображаться в мониторе последовательного вывода
+4. Connect the ESP 32 microcontroller to the computer and select `PlatformIO:Upload`. After compiling and downloading the firmware, the output of its operation will be displayed in the serial output monitor
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 <!-- DOCUMENTATION -->
 ## Documentation
-В данном разделе описана структура проекта, а также основные функции функциональных модулей и логика работы приложения в общем.
+This section describes the structure of the project, as well as the main functions of the functional modules and the logic of the application in general.
 
 ### Structure and setup
-Приложение сделано по модульному принципу. Основной код запуска приложения содержится в файле `src/main.c`, в данном файле происходит функций из модулей в папке `lib`.
+The application is made according to the modular principle. The main application startup code is contained in the file `src/main.c`, in this file there are functions from modules in the folder `lib`.
 
 Файлы настройки:
 
-* `Kconfig.projbuild` - содержатся специфические для данного приложения настройки, которые можно редактировать перед компиляцией через меню настроек `pio run -t menuconfig`
+* `Kconfig.projbuild` - contains application-specific settings that can be edited before compilation via the settings menu `pio run -t menuconfig`
 
-* `partitions.csv` - содержит в себе разметку памяти в микроконтроллере, в данном случае она расширена со стандартных 1 МБ до 2 МБ.
+* `partitions.csv` - it contains the memory layout in the microcontroller, in this case it is expanded from the standard 1 MB to 2 MB.
 
-* `platformio.ini` - отвечает за настройку всего проекта, для более детального изучения обратитесь к [руководству](https://docs.platformio.org/page/projectconf.html)
+* `platformio.ini` - responsible for setting up the entire project, for a more detailed study, refer to the [manual](https://docs.platformio.org/page/projectconf.html)
 
-* `sdkconfig.defaults` - содержит общие настройки ESP-IDF, которые установлены по умолчанию
+* `sdkconfig.defaults` - contains the general ESP-IDF settings, which are set by default
 
 ### Modules
-В данном разделе описаны основная функциональность всех модулей, без глубокого разбора всех структур и стандартных особенностей работы с ESP-IDF, FreeRTOS и ESP-32.
+This section describes the basic functionality of all modules, without in-depth analysis of all structures and standard features of working with ESP-IDF, FreeRTOS and ESP-32.
 
 #### common
-Обеспечивает доступ к основным параметрам приложения другим модулям, реализует необходимые для работы Bluetooth структуры, а также функции для работы с GATT и GAP.
+Provides access to the main parameters of the application to other modules, implements the structures necessary for Bluetooth operation, as well as functions for working with GATT and GAP.
 
 #### connections
-Реализует базу данных множественных соединений мобильных устройств с микроконтроллером. Обеспечивает полный менеджмент базы данных: создание и удаление записи, изменение значений световых режимов (яркости и цветовой температуры).
+Implements a database of multiple connections of mobile devices with a microcontroller. Provides full database management: creating and deleting records, changing the values of light modes (brightness and color temperature).
 
 #### ledc_control
-Обеспечивает взаимодействие с подключенной лампой через два канала ШИМ: один канал для управление светодиода холодной температуры, второй канал для управления светодиода теплой температуры. Реализует плавный переход между значениями температуры и яркости.
+Provides interaction with the connected lamp via two PWM channels: one channel for controlling the cold temperature LED, the second channel for controlling the warm temperature LED. Implements a smooth transition between temperature and brightness values.
 
 #### service_auth
-Реализует функцию обработчик событий GATT, который создает GATT сервис `Authentication` с характеристикой `Authorization data`. Данная функция обрабатывает все события, связанные с чтением/записью/индикацией/уведомлением характеристики аутентификации, также она заносит подключение в базу данных подключений модуля `connections`
+Implements the GATT event handler function, which creates the GATT service `Authentication` with the characteristic `Authorization data`. This function processes all events related to reading/writing/indication/notification of authentication characteristics, and it also enters the connection into the database of connections of the `connections` module.
 
 #### service_light
-Реализует функцию обработчик событий GATT, который создает GATT сервис `Light manage` с характеристикой `Level of light`. Данная функция обрабатывает все события, связанные с чтением/записью/индикацией/уведомлением характеристики аутентификации, также она заносит подключение в базу данных подключений модуля `connections`. Функция `consensus_light_set` управляет световым режимом консенсуса, т.е. когда несколько пользователей со своими световыми режимами подключаются к одному микроконтроллеру, то эта функция находит среднее значение между всеми режимами - консенсус. Когда пользователь отключается, то консенсус пересчитывается.
+Implements the GATT event handler function, which creates the GATT service `Light manage` with the characteristic `Level of light`. This function processes all events related to reading/writing/indication/notification of authentication characteristics, and it also enters the connection into the database of connections of the `connections` module. The `consensus_light_set` function controls the consensus light mode, i.e. when several users with their own light modes connect to one microcontroller, this function finds the average value between all the consensus modes. When the user disconnects, the consensus is recalculated.
 
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-Приложение разработано в рамках НИР "Разработка механизмов проекцирования процессов жизнедеятельности пользователей в экосистему их цифровых ассистентов" №621308
+The application was developed within the framework of the research project "Development of mechanisms for designing the processes of users' vital activity into the ecosystem of their digital assistants" No. 621308
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
