@@ -33,7 +33,7 @@ This application allows you to control the color temperature and brightness of t
 * [![PlatformIO][platformio-shield]][platformio-url]
 
 ### Requirements
-* ESP32 WROOM DevKit v1 или ESP32 Wemods D1 mini
+* ESP32 WROOM DevKit v1 or ESP32 Wemods D1 mini
 * OC Ubuntu/Windows
 * VScode
 * Platformio
