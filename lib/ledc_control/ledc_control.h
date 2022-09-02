@@ -32,10 +32,24 @@ typedef struct {
     int color_temperature;
 } light_mode_t;
 
-
+/**
+ * Init ledc driver
+ */
 void ledc_init(void);
+
+/**
+ * Smooth adjustment of two light channels
+ */
 void ledc_fade_control(uint32_t warm_duty, uint32_t cold_duty);
+
+/**
+ * Set brightness
+ */
 void ledc_set_brightness(int brightness, light_mode_t *light_mode);
+
+/**
+ * Set color from temp and brightness
+ */
 void ledc_set_color(uint32_t color_temperature, light_mode_t *light_mode);
 
 #endif

@@ -13,6 +13,9 @@
 
 #define AUTH_MSG_BUFFER_LEN       50
 
+/**
+ * Handles auth service events, also authorize connections
+ */
 void gatts_profile_auth_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 
 #endif

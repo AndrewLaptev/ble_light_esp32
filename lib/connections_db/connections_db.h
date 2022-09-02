@@ -33,6 +33,13 @@ const char* err_connect_check(err_connect err);
 err_connect add_connection_to_db (connections_db_t *db, esp_ble_gatts_cb_param_t *param);
 err_connect remove_connection_from_db (connections_db_t *db, esp_ble_gatts_cb_param_t *param);
 void write_light_mode_to_db(connections_db_t *db, esp_ble_gatts_cb_param_t *param, light_mode_t *light_mode);
+
+/**
+ * Show db table in ESP_LOGI out function
+ * 
+ * @param db db pointer
+ * @param sum_rows number printed rows of table (-1 for show all DB rows)
+ */
 void show_db(connections_db_t *db, int sum_rows);
 
 #endif
