@@ -20,6 +20,8 @@
 
 This application allows you to control the color temperature and brightness of the LED lamp via PWM. Management is carried out through the mobile application [BLight](https://github.com/AndrewLaptev/ble_light_mobile) via Bluetooth Low Energy.
 
+In the future, it is possible to develop the service towards automating the selection of the light mode for the user. This can be done, for example, through API interaction mobile application with the user's digital profile, which can transmit to the application the necessary data about switching light modes that are currently most suitable for the user
+
 ### Features:
 * ensuring the work of several clients connected through the BLight mobile application at once
 * control of the light mode based on the preferences of all connected clients (consensus)
